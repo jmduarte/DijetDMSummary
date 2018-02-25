@@ -81,6 +81,26 @@ legend_entries = {
 	"ATLAS_EXOT1701_obs":"ATLAS Boosted Dijet, 13 TeV"
 }
 
+# Maximum Gamma/M values
+max_gom = {
+	"EXO16056_narrow_obs":0.12,
+	"EXO16056_wide_obs":0.3,
+	"EXO16057_SR1_obs":0.12,
+	"EXO16057_SR2_obs":0.12,
+	"EXO17001_obs":0.12,
+	"EXO14005_obs":0.12,
+	"CDF_Run1":0.12,
+	"CDF_Run2":0.12,
+	"UA2":0.12,
+	"ATLAS_8TeV":0.12,
+	"ATLAS_EXOT1701_obs":0.12,
+}
+
+# Maximum gq values 
+max_gq = {
+	"EXO16046_obs":1.45,
+}
+
 if __name__ == "__main__":
 	from argparse import ArgumentParser
 	parser = ArgumentParser(description='Make g_q summary plot')
@@ -92,6 +112,7 @@ CDF_Run1,CDF_Run2,EXO16057_SR2_obs", help="Analyses to plot (CADI lines, comma-s
 	parser.add_argument('--logx', action='store_true', help='Log x')
 	parser.add_argument('--logy', action='store_true', help='Log y')
 	parser.add_argument('--goms', type=str, default="0.1,0.3", help='List of Gamma/M values to draw')
+	parser.add_argument('--gom_fills', action='store_true', help='Draw fills for exclusions with Gamma/M or gq upper bound')	
 	cms_label_group = parser.add_mutually_exclusive_group(required=False)
 	cms_label_group.add_argument('--cms', action='store_true', help="Draw CMS label")
 	cms_label_group.add_argument('--cms_text', type=str, help="Draw CMS label with extra text")
@@ -99,13 +120,26 @@ CDF_Run1,CDF_Run2,EXO16057_SR2_obs", help="Analyses to plot (CADI lines, comma-s
 
 	gq_plot = GQSummaryPlot("gq_all")
 
+	# If args.goms_fills is specified, don't draw the "line_width=402" style fill
+	if args.gom_fills:
+		for style_name in style:
+			style[style_name]["line_width"] = 2
+
 	# Load data
 	analysis_data = {}
 	analyses = args.analyses.split(",")
 	for analysis in analyses:
 		analysis_data[analysis] = DijetData(analysis)
+		if args.gom_fills and analysis in max_gom:
+			this_max_gom = max_gom[analysis]
+		else:
+			this_max_gom = False
+		if args.gom_fills and analysis in max_gq:
+			this_max_gq = max_gq[analysis]
+		else:
+			this_max_gq = False		
 		analysis_data[analysis].load_data("data/{}.dat".format(analysis))
-		gq_plot.add_data(analysis_data[analysis], analysis, legend_entries[analysis])
+		gq_plot.add_data(analysis_data[analysis], analysis, legend_entries[analysis], max_gom=this_max_gom, max_gq=this_max_gq)
 
 	# Style the plot
 	gq_plot.set_style(style)
@@ -130,7 +164,8 @@ CDF_Run1,CDF_Run2,EXO16057_SR2_obs", help="Analyses to plot (CADI lines, comma-s
 		legend_ncolumns=3,
 		draw_Z_constraint=True,
 		gom_x=60.,
-		vector_label={"x":50., "y":1.2, "text":"Z'#rightarrowq#bar{q}"}
+		model_label={"x":48., "y":1.25, "text":"Z'#rightarrowq#bar{q}"},
+		gom_fills=args.gom_fills
 		)
 	gq_plot.save("plots")
 

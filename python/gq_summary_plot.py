@@ -26,6 +26,7 @@ class GQSummaryPlot:
 		self._dijet_data = {}
 		self._legend_entries = {}
 		self._graphs = {}
+		self._limit_fills = {}
 		self._GoMs = []
 		self._vtype = "vector"
 		self._style = {"default":{
@@ -52,11 +53,16 @@ class GQSummaryPlot:
 			raise ValueError("[set_vtype] Argument vtype must be 'vector' or 'axial'")
 		self._vtype = vtype
 
-	def add_data(self, dijet_data, name, legend):
+	def add_data(self, dijet_data, name, legend, max_gom=False, max_gq=False):
 		self._analyses.append(name)
 		self._dijet_data[name] = dijet_data
 		self._legend_entries[name] = legend
 		self._graphs[name] = dijet_data.get_graph()
+
+		if max_gom:
+			self._limit_fills[name] = self.create_limit_gom_fill(dijet_data.get_graph(), max_gom)
+		if max_gq:
+			self._limit_fills[name] = self.create_limit_gq_fill(dijet_data.get_graph(), max_gq)
 
 	def set_width_curves(self, GoMs):
 		self._GoMs = GoMs
@@ -99,8 +105,9 @@ class GQSummaryPlot:
 			graph.SetFillColor(self._style["default"]["fill_color"])
 
 	# Create a polygon TGraph corresponding to the excluded range including an upper limit from Gamma/M
-	def create_limit_gom_fill(self, limit_graph, gom):
-		tf_gom = TF1("tmp_tf1_gq_{}".format(GoM), lambda x, this_gom=GoM: gom_to_gq(this_gom, x[0], self._vtype), 0.1, 10000., 0) # 
+	# This is pretty ugly. Can it be improved?
+	def create_limit_gom_fill(self, limit_graph, max_gom):
+		tf_gom = TF1("tmp_tf1_gq_{}".format(max_gom), lambda x, this_gom=max_gom: gom_to_gq(this_gom, x[0], self._vtype), 0.1, 10000., 0) # 
 
 		# Calculate new graph that stays at or below the gom curve
 		new_limit_points = {}
@@ -135,7 +142,7 @@ class GQSummaryPlot:
 						gomhigh = gommid
 				int_x = (xhigh + xlow) / 2.
 				int_y = (yhigh + ylow) / 2.
-			new_limit_points[int_x] = int_y
+				new_limit_points[int_x] = int_y
 
 		# Move any old points above the GOM to the GOM
 		for i in xrange(limit_graph.GetN()):
@@ -146,7 +153,7 @@ class GQSummaryPlot:
 
 		# New graph: limit points
 		new_graph = TGraph(len(new_limit_points) + 10000)
-		for i, x in enumerate(new_limit_points.keys().sorted()):
+		for i, x in enumerate(sorted(new_limit_points.keys())):
 			new_graph.SetPoint(i, x, new_limit_points[x])
 
 		# New graph: upper boundary corresponding to GOM
@@ -157,10 +164,46 @@ class GQSummaryPlot:
 			new_graph.SetPoint(len(new_limit_points) + i, this_x, tf_gom.Eval(this_x))
 		return new_graph
 
+	def create_limit_gq_fill(self, limit_graph, max_gq):
+		# Calculate new graph that stays at or below max_gq
+		new_limit_points = {}
+		limit_x = limit_graph.GetX()
+		limit_y = limit_graph.GetY()
+		for i in xrange(limit_graph.GetN() - 1):
+			x1 = limit_x[i]
+			x2 = limit_x[i+1]
+			y1 = limit_y[i]
+			y2 = limit_y[i+1]
+			if (y1 < max_gq and y2 > max_gq) or (y1 > max_gq and y2 < max_gq):
+				# Calculate intersection of interpolation with gq
+				int_x = (max_gq - y1) * (x2 - x1) / (y2 - y1) + x1 
+				int_y = max_gq
+				new_limit_points[int_x] = int_y
+
+		# Move any old points above gq to gq
+		for i in xrange(limit_graph.GetN()):
+			if limit_y[i] > max_gq:
+				new_limit_points[limit_x[i]] = max_gq
+			else:
+				new_limit_points[limit_x[i]] = limit_y[i]
+
+		# New graph: limit points
+		new_graph = TGraph(len(new_limit_points) + 3)
+		for i, x in enumerate(sorted(new_limit_points.keys())):
+			new_graph.SetPoint(i, x, new_limit_points[x])
+
+		# New graph: upper boundary corresponding to gq
+		xmin = min(new_limit_points.keys())
+		xmax = max(new_limit_points.keys())
+		new_graph.SetPoint(len(new_limit_points), xmax, max_gq)
+		new_graph.SetPoint(len(new_limit_points) + 1, xmin, max_gq)
+		new_graph.SetPoint(len(new_limit_points) + 2, xmin, new_limit_points[xmin])
+		return new_graph
+
 	def draw(self, 
 		logx=False, 
 		logy=False, 
-		x_title="M_{Med} [GeV]", 
+		x_title="M_{Z'} [GeV]", 
 		y_title="g'_{q}", 
 		x_range=[40., 7000.],
 		y_range=[0, 1.45],
@@ -169,11 +212,13 @@ class GQSummaryPlot:
 		draw_cms=None,
 		legend_text_size=0.028,
 		legend_ncolumns=None,
-		legend_obsexp=False,
+		legend_obsexp=False, # Add a solid and dotted line to legend for obs and exp
 		draw_Z_constraint=False,
-		gom_x=None,
-		vector_label=False):
-		canvas_name = "c_{}_{}_{}".format(self._name, ("logx" if logx else "linearx"), ("logy" if logy else "lineary"))
+		gom_x=None, # x coordinate for Gamma/M labels
+		model_label=False, # Add a string specifying the model on the plot
+		gom_fills=False # Draw limit fills including upper boundaries
+		):
+		canvas_name = "c_{}_{}_{}{}".format(self._name, ("logx" if logx else "linearx"), ("logy" if logy else "lineary"), ("_gomfills" if gom_fills else ""))
 		self._canvas = TCanvas(canvas_name, canvas_name, canvas_dim[0], canvas_dim[1])
 		ROOT.gStyle.SetPadTickX(1)
 		ROOT.gStyle.SetPadTickY(1)
@@ -234,6 +279,12 @@ class GQSummaryPlot:
 		#if logy:
 		#	self._frame.GetYaxis().SetMoreLogLabels()
 
+		# Draw limit fills first, if any
+		for name, limit_fill in self._limit_fills.iteritems():
+			self._limit_fills[name].SetFillStyle(3003)
+			self._limit_fills[name].SetFillColor(self._style[name]["fill_color"])
+			self._limit_fills[name].Draw("F")
+
 		for analysis_name in self._analyses:
 			self.style_graph(self._graphs[analysis_name], analysis_name)
 			self._graphs[analysis_name].Draw("lp")
@@ -270,7 +321,7 @@ class GQSummaryPlot:
 					label_xfrac = 0.864
 				label_x = (x_range[1] - x_range[0]) * label_xfrac + x_range[0]
 			if logy:
-				label_y = self._GoM_tf1s[GoM].Eval(label_x) * 0.8
+				label_y = self._GoM_tf1s[GoM].Eval(label_x) * 0.85
 				gom_text = "#Gamma/M_{{Med}} = {}%".format(int(GoM * 100))
 			else:
 				# label_y = self._GoM_tf1s[GoM].Eval(label_x) - 0.085 # For labels under the line
@@ -285,11 +336,11 @@ class GQSummaryPlot:
 			self._GoM_labels[GoM].Draw("same")
 
 		# Vector label
-		if vector_label:
-			self._vector_label = TLatex(vector_label["x"], vector_label["y"], vector_label["text"])
-			self._vector_label.SetTextSize(0.04)
-			self._vector_label.SetTextColor(1)
-			self._vector_label.Draw("same")
+		if model_label:
+			self._model_label = TLatex(model_label["x"], model_label["y"], model_label["text"])
+			self._model_label.SetTextSize(0.04)
+			self._model_label.SetTextColor(1)
+			self._model_label.Draw("same")
 
 		# Legend last, to be on top of lines
 		self._legend.Draw()
