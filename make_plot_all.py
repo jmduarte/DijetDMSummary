@@ -164,7 +164,7 @@ CDF_Run1,CDF_Run2,EXO16057_SR2_obs", help="Analyses to plot (CADI lines, comma-s
 		legend_ncolumns=3,
 		draw_Z_constraint=True,
 		gom_x=60.,
-		model_label={"x":48., "y":1.25, "text":"Z'#rightarrowq#bar{q}"},
+		model_label={"x":2100., "y":0.8, "text":"Z'#rightarrowq#bar{q}"},
 		gom_fills=args.gom_fills
 		)
 	gq_plot.save("plots")
