@@ -11,10 +11,17 @@ More details:
 - The executables are make_plot_*.py. These contain all the plot styling options, which are passed as function arguments to GQSummaryPlot::add_data() and GQSummaryPlot::draw(). 
 
 Command line arguments:
+
 `--analyses`: Analyses to plot, corresponding to filenames in data/*.dat. The order of analyses corresponds to the legend order (remembe that TLegends with multiple columns fill in entries from left to right, then top to bottom).
+
 `--logx`
+
 `--logy`
+
 `--goms`: Gamma/M values to draw as dashed lines.
+
 `--gom_fills`: Draw filled areas corresponding to excluded range, including the range of validity due to Gamma/M getting too large.
+
 `--cms`: Draw CMS label.
+
 `--cms_text [extra text]`: Draw CMS label with extra text, e.g. CMS Preliminary
