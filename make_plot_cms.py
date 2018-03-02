@@ -16,9 +16,9 @@ style = {
 		"fill_style":3004,
 		"fill_color":0,
 	}, "EXO16046_obs":{
-		"line_color":seaborn_colors.get_root_color("Blues_d", 2),		
+		"line_color":seaborn_colors.get_root_color("Blues_d", 3),		
 		"line_style":1,
-		"fill_color":seaborn_colors.get_root_color("Blues_d", 2),		
+		"fill_color":seaborn_colors.get_root_color("Blues_d", 3),		
 	}, "EXO16046_exp":{
 		"line_color":seaborn_colors.get_root_color("Blues_d", 5),		
 		"line_style":2,
@@ -34,9 +34,9 @@ style = {
 		"line_width":2,
 		"fill_color":seaborn_colors.get_root_color("Reds_d", 5),		
 	}, "EXO16056_wide_obs":{
-		"line_color":seaborn_colors.get_root_color("Purples_d", 2),		
+		"line_color":seaborn_colors.get_root_color("Purples_d", 3),		
 		"line_style":1,
-		"fill_color":seaborn_colors.get_root_color("Purples_d", 2),		
+		"fill_color":seaborn_colors.get_root_color("Purples_d", 3),		
 	}, "EXO16056_wide_exp":{
 		"line_color":seaborn_colors.get_root_color("Purples_d", 5),		
 		"line_style":2,
@@ -121,7 +121,7 @@ if __name__ == "__main__":
 EXO17001_obs,EXO17001_exp,\
 EXO16057_SR1_obs,EXO16057_SR1_exp,\
 EXO16057_SR2_obs,EXO16057_SR2_exp,\
-EXO14005_obs,\
+EXO14005_obs,EXO14005_exp,\
 EXO16056_narrow_obs,EXO16056_narrow_exp,\
 EXO16056_wide_obs,EXO16056_wide_exp,\
 EXO16046_obs,EXO16046_exp", help="Analyses to plot (CADI lines, comma-separated)") 

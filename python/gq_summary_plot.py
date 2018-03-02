@@ -322,11 +322,11 @@ class GQSummaryPlot:
 				label_x = (x_range[1] - x_range[0]) * label_xfrac + x_range[0]
 			if logy:
 				label_y = self._GoM_tf1s[GoM].Eval(label_x) * 0.85
-				gom_text = "#Gamma/M_{{Med}} = {}%".format(int(GoM * 100))
+				gom_text = "#Gamma/M_{{Z'}} = {}%".format(int(GoM * 100))
 			else:
 				# label_y = self._GoM_tf1s[GoM].Eval(label_x) - 0.085 # For labels under the line
-				label_y = self._GoM_tf1s[GoM].Eval(label_x) + 0.085 # For labels over the line
-				gom_text = "#frac{{#Gamma}}{{M_{{Med}}}} = {}%".format(int(GoM * 100))
+				label_y = self._GoM_tf1s[GoM].Eval(label_x) + 0.05 # For labels over the line
+				gom_text = "#frac{{#Gamma}}{{M_{{Z'}}}} = {}%".format(int(GoM * 100))
 			self._GoM_labels[GoM] = TLatex(label_x, label_y, gom_text)
 			if logy:
 				self._GoM_labels[GoM].SetTextSize(0.028)
