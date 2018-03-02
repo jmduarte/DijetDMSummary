@@ -55,10 +55,18 @@ style = {
 		"line_color":seaborn_colors.get_root_color("Blues_d", 0),
 		"line_style":7, 
 		"fill_color":seaborn_colors.get_root_color("Blues_d", 0),
+	}, "gBMZB_CMS_20_fbinv":{
+		"line_color":seaborn_colors.get_root_color("Blues_d", 2),
+		"line_style":7, 
+		"fill_color":seaborn_colors.get_root_color("Blues_d", 2),
 	}, "ATLAS_8TeV":{
 		"line_color":seaborn_colors.get_root_color("Greens_d", 4),
 		"line_style":3, 
 		"fill_color":seaborn_colors.get_root_color("Greens_d", 4),
+	}, "gBMZB_ATLAS_all_fbinv":{
+		"line_color":seaborn_colors.get_root_color("Greens_d", 2),
+		"line_style":3, 
+		"fill_color":seaborn_colors.get_root_color("Greens_d", 2),
 	}, "ATLAS_EXOT1701_obs":{
 		"line_color":seaborn_colors.get_root_color("Reds_d", 4),
 		"line_style":3, 
@@ -76,9 +84,11 @@ legend_entries = {
 	"CDF_Run1":"CDF Run1",
 	"CDF_Run2":"CDF Run2",
 	"UA2":"UA2",
-	"EXO14005_obs":"CMS Dijet, 8 TeV",
+	"EXO14005_obs":"CMS Dijet Scouting, 8 TeV",
 	"ATLAS_8TeV":"ATLAS Dijet, 8 TeV",
-	"ATLAS_EXOT1701_obs":"ATLAS Boosted Dijet, 13 TeV"
+	"ATLAS_EXOT1701_obs":"ATLAS Boosted Dijet, 13 TeV",
+        "gBMZB_CMS_20_fbinv":"CMS Dijet, 8 TeV",
+        "gBMZB_ATLAS_all_fbinv":"ATLAS Dijet, 8 TeV"
 }
 
 # Maximum Gamma/M values
@@ -158,6 +168,7 @@ CDF_Run1,CDF_Run2,EXO16057_SR2_obs", help="Analyses to plot (CADI lines, comma-s
 		y_title="g'_{q}",
 		x_range=[40.,7000.],
 		y_range=[0.01, 2.],
+#		y_range=[0, 0.4],
 		canvas_dim=[1800, 1200],
 		legend_coords=[0.24, 0.15, 0.94, 0.4],
 		legend_text_size=0.0245,
