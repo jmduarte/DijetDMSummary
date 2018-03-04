@@ -15,7 +15,7 @@ class DijetData:
 		self._reference_xses = {
 			8.:{
 				"gq0":0.25, 
-				"txt":os.path.expandvars("$CMSSW_BASE/src/DijetDMSummary/data/reference/ZPrime_8TeV_gq0p25.dat")
+				"txt":os.path.expandvars("data/reference/ZPrime_8TeV_gq0p25.dat")
 			},
 			13.:{}
 		}

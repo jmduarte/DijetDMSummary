@@ -137,7 +137,8 @@ CDF_Run1,CDF_Run2,EXO16057_SR2_obs", help="Analyses to plot (CADI lines, comma-s
 
 	# Load data
 	analysis_data = {}
-	analyses = args.analyses.split(",")
+        if args.analyses=='': analyses = []
+        else: analyses = args.analyses.split(",")
 	for analysis in analyses:
 		analysis_data[analysis] = DijetData(analysis)
 		if args.gom_fills and analysis in max_gom:
